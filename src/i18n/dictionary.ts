@@ -281,6 +281,7 @@ const _dict = {
       contact: "Contact",
     },
   },
-} as const;
+};
 
-export type Dict = typeof dictionary.cs;
+export type Dict = typeof _dict.cs;
+export const dictionary: Record<Lang, Dict> = _dict;
