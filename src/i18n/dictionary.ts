@@ -1,6 +1,6 @@
 export type Lang = "cs" | "en";
 
-export const dictionary = {
+const _dict = {
   cs: {
     nav: {
       home: "Domů",
