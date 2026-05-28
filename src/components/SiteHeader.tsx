@@ -58,12 +58,24 @@ export function SiteHeader() {
               EN
             </button>
           </div>
-
           <Link
             to="/contact"
             className="hidden md:inline-flex items-center border border-gold text-gold px-5 py-2.5 text-xs uppercase tracking-[0.2em] hover:bg-gold hover:text-primary-foreground transition-smooth"
           >
             {t.nav.cta}
+          </Link>
+
+          {isAdmin && (
+            <Link
+              to="/admin"
+              title="Admin"
+              className="hidden md:inline-flex items-center gap-1.5 text-gold/80 hover:text-gold transition-smooth text-xs uppercase tracking-[0.2em]"
+            >
+              <Shield size={14} /> Admin
+            </Link>
+          )}
+
+
           </Link>
 
           <button
