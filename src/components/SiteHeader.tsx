@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Shield } from "lucide-react";
 import { Logo } from "./Logo";
 import { useLang } from "@/i18n/LanguageProvider";
+import { useAuth } from "@/hooks/useAuth";
 
 export function SiteHeader() {
   const { t, lang, setLang } = useLang();
+  const { isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
+
 
   const nav = [
     { to: "/", label: t.nav.home },
