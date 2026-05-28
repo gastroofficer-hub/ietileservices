@@ -76,8 +76,6 @@ export function SiteHeader() {
           )}
 
 
-          </Link>
-
           <button
             className="lg:hidden text-foreground p-2"
             onClick={() => setOpen((o) => !o)}
