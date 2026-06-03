@@ -184,9 +184,9 @@ function HomePage() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <PlaceholderImage ratio="4/5" seed={21} label="Marble Suite" />
-          <PlaceholderImage ratio="4/5" seed={22} label="Atelier Praha" />
-          <PlaceholderImage ratio="4/5" seed={23} label="Black Mineral" />
+          <GalleryImage photo={featured[0]} ratio="4/5" seed={21} label="Marble Suite" />
+          <GalleryImage photo={featured[1]} ratio="4/5" seed={22} label="Atelier Praha" />
+          <GalleryImage photo={featured[2]} ratio="4/5" seed={23} label="Black Mineral" />
         </div>
       </section>
 
