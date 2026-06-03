@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
+import { LogoMark } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
@@ -194,6 +195,7 @@ function HomePage() {
       <section className="container-luxe pb-28">
         <div className="relative border border-border p-12 md:p-20 overflow-hidden bg-card/40">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,var(--gold)_0%,transparent_50%)]" />
+          <LogoMark className="pointer-events-none absolute -right-10 -bottom-10 w-72 md:w-96 opacity-[0.06]" />
           <div className="relative max-w-2xl">
             <Eyebrow>04 — Začněme</Eyebrow>
             <h2 className="font-display text-4xl sm:text-5xl mt-4">{t.home.ctaBlockTitle}</h2>
