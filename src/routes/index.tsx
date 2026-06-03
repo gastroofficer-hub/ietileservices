@@ -78,22 +78,50 @@ function GalleryImage({
 
 function HomePage() {
   const { t } = useLang();
-  const [photos, setPhotos] = useState<DbPhoto[]>([]);
+  const [hero, setHero] = useState<DbPhoto[]>([]);
+  const [featured, setFeatured] = useState<DbPhoto[]>([]);
 
   useEffect(() => {
-    supabase
-      .from("gallery_photos")
-      .select("id,title_cs,title_en,tag,ratio,image_url")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false })
-      .limit(12)
-      .then(({ data }) => {
-        if (data) setPhotos(data as DbPhoto[]);
-      });
-  }, []);
+    const select = "id,title_cs,title_en,tag,ratio,image_url";
+    (async () => {
+      const [{ data: heroData }, { data: featuredData }, { data: recent }] = await Promise.all([
+        supabase
+          .from("gallery_photos")
+          .select(select)
+          .eq("is_hero", true)
+          .order("sort_order", { ascending: true })
+          .limit(2),
+        supabase
+          .from("gallery_photos")
+          .select(select)
+          .eq("is_featured", true)
+          .order("sort_order", { ascending: true })
+          .limit(3),
+        supabase
+          .from("gallery_photos")
+          .select(select)
+          .order("created_at", { ascending: false })
+          .limit(6),
+      ]);
 
-  const hero = photos.slice(0, 2);
-  const featured = photos.slice(2, 5);
+      const recentList = (recent ?? []) as DbPhoto[];
+      const heroList = (heroData ?? []) as DbPhoto[];
+      const featuredList = (featuredData ?? []) as DbPhoto[];
+
+      // Fallback: fill missing slots with most recent photos not already used
+      const used = new Set<string>([
+        ...heroList.map((p) => p.id),
+        ...featuredList.map((p) => p.id),
+      ]);
+      const pool = recentList.filter((p) => !used.has(p.id));
+
+      while (heroList.length < 2 && pool.length) heroList.push(pool.shift()!);
+      while (featuredList.length < 3 && pool.length) featuredList.push(pool.shift()!);
+
+      setHero(heroList);
+      setFeatured(featuredList);
+    })();
+  }, []);
 
   return (
     <>
