@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trash2, Upload, LogOut } from "lucide-react";
+import { Trash2, Upload, LogOut, Star, Sparkles } from "lucide-react";
 
 type Photo = {
   id: string;
@@ -14,6 +14,8 @@ type Photo = {
   image_url: string;
   sort_order: number;
   created_at: string;
+  is_hero: boolean;
+  is_featured: boolean;
 };
 
 export const Route = createFileRoute("/admin")({
