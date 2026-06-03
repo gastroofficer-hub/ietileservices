@@ -20,6 +20,8 @@ export type Database = {
           created_by: string | null
           id: string
           image_url: string
+          is_featured: boolean
+          is_hero: boolean
           ratio: string
           sort_order: number
           storage_path: string
@@ -32,6 +34,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           image_url: string
+          is_featured?: boolean
+          is_hero?: boolean
           ratio?: string
           sort_order?: number
           storage_path: string
@@ -44,6 +48,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           image_url?: string
+          is_featured?: boolean
+          is_hero?: boolean
           ratio?: string
           sort_order?: number
           storage_path?: string
