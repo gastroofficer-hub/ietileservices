@@ -114,6 +114,21 @@ function AdminPage() {
     await fetchPhotos();
   };
 
+  const togglePlacement = async (p: Photo, field: "is_hero" | "is_featured") => {
+    const next = !p[field];
+    // Optimistic update
+    setPhotos((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: next } : x)));
+    const { error } = await supabase
+      .from("gallery_photos")
+      .update({ [field]: next })
+      .eq("id", p.id);
+    if (error) {
+      // revert
+      setPhotos((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: !next } : x)));
+      alert(error.message);
+    }
+  };
+
   const onLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
