@@ -264,7 +264,23 @@ function AdminPage() {
 
       {/* Photo list */}
       <div className="mt-16">
-        <h2 className="font-display text-3xl">Fotky v galerii ({photos.length})</h2>
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <h2 className="font-display text-3xl">Fotky v galerii ({photos.length})</h2>
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground flex gap-6">
+            <span className="inline-flex items-center gap-2">
+              <Sparkles size={14} className="text-gold" />
+              Hero: {photos.filter((p) => p.is_hero).length} / 2
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Star size={14} className="text-gold" />
+              Vybrané: {photos.filter((p) => p.is_featured).length} / 3
+            </span>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Označte fotky ikonami níže — Hero se zobrazí v úvodním bloku (2 fotky),
+          „Vybrané" v sekci Vybrané realizace (3 fotky).
+        </p>
 
         {loadingPhotos ? (
           <p className="mt-8 text-muted-foreground">Načítání…</p>
@@ -281,6 +297,20 @@ function AdminPage() {
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
+                  {(p.is_hero || p.is_featured) && (
+                    <div className="absolute top-2 left-2 flex gap-1">
+                      {p.is_hero && (
+                        <span className="bg-gold text-primary-foreground text-[9px] uppercase tracking-[0.2em] px-2 py-1 inline-flex items-center gap-1">
+                          <Sparkles size={10} /> Hero
+                        </span>
+                      )}
+                      {p.is_featured && (
+                        <span className="bg-gold text-primary-foreground text-[9px] uppercase tracking-[0.2em] px-2 py-1 inline-flex items-center gap-1">
+                          <Star size={10} /> Vybrané
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -297,6 +327,28 @@ function AdminPage() {
                     aria-label="Smazat"
                   >
                     <Trash2 size={16} />
+                  </button>
+                </div>
+                <div className="px-4 pb-4 flex gap-2">
+                  <button
+                    onClick={() => togglePlacement(p, "is_hero")}
+                    className={`flex-1 inline-flex items-center justify-center gap-2 border px-3 py-2 text-[10px] uppercase tracking-[0.2em] transition-smooth ${
+                      p.is_hero
+                        ? "bg-gold text-primary-foreground border-gold"
+                        : "border-border text-muted-foreground hover:border-gold hover:text-gold"
+                    }`}
+                  >
+                    <Sparkles size={12} /> Hero
+                  </button>
+                  <button
+                    onClick={() => togglePlacement(p, "is_featured")}
+                    className={`flex-1 inline-flex items-center justify-center gap-2 border px-3 py-2 text-[10px] uppercase tracking-[0.2em] transition-smooth ${
+                      p.is_featured
+                        ? "bg-gold text-primary-foreground border-gold"
+                        : "border-border text-muted-foreground hover:border-gold hover:text-gold"
+                    }`}
+                  >
+                    <Star size={12} /> Vybrané
                   </button>
                 </div>
               </div>
