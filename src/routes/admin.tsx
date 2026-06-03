@@ -116,14 +116,10 @@ function AdminPage() {
 
   const togglePlacement = async (p: Photo, field: "is_hero" | "is_featured") => {
     const next = !p[field];
-    // Optimistic update
     setPhotos((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: next } : x)));
-    const { error } = await supabase
-      .from("gallery_photos")
-      .update({ [field]: next })
-      .eq("id", p.id);
+    const update = field === "is_hero" ? { is_hero: next } : { is_featured: next };
+    const { error } = await supabase.from("gallery_photos").update(update).eq("id", p.id);
     if (error) {
-      // revert
       setPhotos((prev) => prev.map((x) => (x.id === p.id ? { ...x, [field]: !next } : x)));
       alert(error.message);
     }
