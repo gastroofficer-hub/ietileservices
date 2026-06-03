@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
+import { LogoMark } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
