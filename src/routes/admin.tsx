@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trash2, Upload, LogOut, Star, Sparkles } from "lucide-react";
+import { Trash2, Upload, LogOut, Star, Sparkles, X, ZoomIn } from "lucide-react";
 
 type Photo = {
   id: string;
@@ -32,6 +32,7 @@ function AdminPage() {
   const navigate = useNavigate();
   const { session, loading, isAdmin, user } = useAuth();
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [lightbox, setLightbox] = useState<Photo | null>(null);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
 
   // Upload form
@@ -46,6 +47,18 @@ function AdminPage() {
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/login", replace: true });
   }, [loading, session, navigate]);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setLightbox(null);
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [lightbox]);
 
   const fetchPhotos = useCallback(async () => {
     setLoadingPhotos(true);
@@ -290,13 +303,25 @@ function AdminPage() {
           <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {photos.map((p) => (
               <div key={p.id} className="border border-border group">
-                <div className="relative overflow-hidden" style={{ aspectRatio: p.ratio }}>
+                <button
+                  type="button"
+                  onClick={() => setLightbox(p)}
+                  className="relative overflow-hidden w-full block cursor-zoom-in"
+                  style={{ aspectRatio: p.ratio }}
+                  aria-label={`Zvětšit ${p.title_cs}`}
+                >
                   <img
                     src={p.image_url}
                     alt={p.title_cs}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
+                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/40 transition-smooth flex items-center justify-center">
+                    <ZoomIn
+                      size={32}
+                      className="text-gold opacity-0 group-hover:opacity-100 transition-smooth"
+                    />
+                  </div>
                   {(p.is_hero || p.is_featured) && (
                     <div className="absolute top-2 left-2 flex gap-1">
                       {p.is_hero && (
@@ -311,7 +336,7 @@ function AdminPage() {
                       )}
                     </div>
                   )}
-                </div>
+                </button>
                 <div className="p-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-display text-lg truncate">{p.title_cs}</div>
@@ -356,6 +381,41 @@ function AdminPage() {
           </div>
         )}
       </div>
+
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            className="absolute top-6 right-6 text-foreground hover:text-gold transition-smooth"
+            aria-label="Zavřít"
+          >
+            <X size={32} />
+          </button>
+          <figure
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-7xl max-h-[90vh] flex flex-col items-center gap-4"
+          >
+            <img
+              src={lightbox.image_url}
+              alt={lightbox.title_cs}
+              className="max-w-full max-h-[80vh] object-contain border border-border"
+            />
+            <figcaption className="text-center">
+              <div className="font-display text-2xl">{lightbox.title_cs}</div>
+              {lightbox.tag && (
+                <div className="text-[10px] uppercase tracking-[0.25em] text-gold mt-1">
+                  {lightbox.tag}
+                </div>
+              )}
+            </figcaption>
+          </figure>
+        </div>
+      )}
     </section>
   );
 }
