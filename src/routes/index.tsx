@@ -43,45 +43,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function GalleryImage({
-  photo,
-  ratio,
-  label,
-  className,
-  seed,
-}: {
-  photo?: DbPhoto;
-  ratio: string;
-  label?: string;
-  className?: string;
-  seed: number;
-}) {
-  const { lang } = useLang();
-  if (!photo) {
-    return <PlaceholderImage ratio={ratio} seed={seed} label={label} className={className} />;
-  }
-  const title = lang === "en" ? photo.title_en ?? photo.title_cs : photo.title_cs;
-  return (
-    <figure className={`relative overflow-hidden group border border-border/40 ${className ?? ""}`}>
-      <div style={{ aspectRatio: ratio }} className="overflow-hidden">
-        <img
-          src={photo.image_url}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-      </div>
-      {label !== undefined && (
-        <figcaption className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background/90 to-transparent">
-          <div className="font-display text-xl text-foreground">{title}</div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-gold mt-1">
-            I&amp;E · {String(seed).padStart(2, "0")}
-          </div>
-        </figcaption>
-      )}
-    </figure>
-  );
-}
 
 function HomePage() {
   const { t, lang } = useLang();
