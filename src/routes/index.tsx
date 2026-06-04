@@ -84,51 +84,68 @@ function GalleryImage({
 }
 
 function HomePage() {
-  const { t } = useLang();
-  const [hero, setHero] = useState<DbPhoto[]>([]);
-  const [featured, setFeatured] = useState<DbPhoto[]>([]);
+  const { t, lang } = useLang();
+  const [photos, setPhotos] = useState<DbPhoto[]>([]);
+  const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
 
   useEffect(() => {
-    const select = "id,title_cs,title_en,tag,ratio,image_url";
     (async () => {
-      const [{ data: heroData }, { data: featuredData }, { data: recent }] = await Promise.all([
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .eq("is_hero", true)
-          .order("sort_order", { ascending: true })
-          .limit(2),
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .eq("is_featured", true)
-          .order("sort_order", { ascending: true })
-          .limit(3),
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .order("created_at", { ascending: false })
-          .limit(6),
-      ]);
-
-      const recentList = (recent ?? []) as DbPhoto[];
-      const heroList = (heroData ?? []) as DbPhoto[];
-      const featuredList = (featuredData ?? []) as DbPhoto[];
-
-      // Fallback: fill missing slots with most recent photos not already used
-      const used = new Set<string>([
-        ...heroList.map((p) => p.id),
-        ...featuredList.map((p) => p.id),
-      ]);
-      const pool = recentList.filter((p) => !used.has(p.id));
-
-      while (heroList.length < 2 && pool.length) heroList.push(pool.shift()!);
-      while (featuredList.length < 3 && pool.length) featuredList.push(pool.shift()!);
-
-      setHero(heroList);
-      setFeatured(featuredList);
+      const { data } = await supabase
+        .from("gallery_photos")
+        .select(
+          "id,title_cs,title_en,tag,ratio,image_url,hero_slot,featured_slot,hero_order,featured_order,created_at",
+        )
+        .order("created_at", { ascending: false });
+      if (data) setPhotos(data as DbPhoto[]);
     })();
   }, []);
+
+  // Group photos into slot buckets and build fallback pool from recent photos
+  const { heroSlots, featuredSlots } = useMemo(() => {
+    const heroSlots: DbPhoto[][] = [[], []];
+    const featuredSlots: DbPhoto[][] = [[], [], []];
+    const used = new Set<string>();
+
+    photos.forEach((p) => {
+      if (p.hero_slot === 1 || p.hero_slot === 2) {
+        heroSlots[p.hero_slot - 1].push(p);
+        used.add(p.id);
+      }
+      if (p.featured_slot === 1 || p.featured_slot === 2 || p.featured_slot === 3) {
+        featuredSlots[p.featured_slot - 1].push(p);
+        used.add(p.id);
+      }
+    });
+
+    heroSlots.forEach((arr) => arr.sort((a, b) => a.hero_order - b.hero_order));
+    featuredSlots.forEach((arr) =>
+      arr.sort((a, b) => a.featured_order - b.featured_order),
+    );
+
+    // Fallback: fill empty slots with most recent unused photos
+    const pool = photos.filter((p) => !used.has(p.id));
+    heroSlots.forEach((arr) => {
+      if (arr.length === 0 && pool.length) arr.push(pool.shift()!);
+    });
+    featuredSlots.forEach((arr) => {
+      if (arr.length === 0 && pool.length) arr.push(pool.shift()!);
+    });
+
+    return { heroSlots, featuredSlots };
+  }, [photos]);
+
+  const renderSlot = (slot: DbPhoto[], ratio: string, seed: number, extra = "") =>
+    slot.length > 0 ? (
+      <PhotoCarousel
+        photos={slot}
+        ratio={ratio}
+        lang={lang}
+        className={extra}
+        onPhotoClick={(p) => setLightbox(p as DbPhoto)}
+      />
+    ) : (
+      <PlaceholderImage ratio={ratio} seed={seed} className={extra} />
+    );
 
   return (
     <>
