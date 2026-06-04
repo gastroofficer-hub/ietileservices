@@ -38,6 +38,7 @@ function GalleryPage() {
   const [tag, setTag] = useState(0);
   const [photos, setPhotos] = useState<DbPhoto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
 
   useEffect(() => {
     supabase
