@@ -32,6 +32,7 @@ function AdminPage() {
   const navigate = useNavigate();
   const { session, loading, isAdmin, user } = useAuth();
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [lightbox, setLightbox] = useState<Photo | null>(null);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
 
   // Upload form
