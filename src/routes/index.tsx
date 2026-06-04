@@ -262,6 +262,16 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      {lightbox && (
+        <Lightbox
+          src={lightbox.image_url}
+          alt={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          caption={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          tag={lightbox.tag}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </>
   );
 }
