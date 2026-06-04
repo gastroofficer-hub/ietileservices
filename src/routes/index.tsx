@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
 import { LogoMark } from "@/components/Logo";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
@@ -13,6 +15,11 @@ type DbPhoto = {
   tag: string | null;
   ratio: string;
   image_url: string;
+  hero_slot: number | null;
+  featured_slot: number | null;
+  hero_order: number;
+  featured_order: number;
+  created_at: string;
 };
 
 export const Route = createFileRoute("/")({
