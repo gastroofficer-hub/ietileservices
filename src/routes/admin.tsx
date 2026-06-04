@@ -255,12 +255,11 @@ function AdminPage() {
 
     // Persist
     await Promise.all(
-      bucket.map((p, idx) =>
-        supabase
-          .from("gallery_photos")
-          .update({ [orderField]: idx })
-          .eq("id", p.id),
-      ),
+      bucket.map((p, idx) => {
+        const update =
+          kind === "hero" ? { hero_order: idx } : { featured_order: idx };
+        return supabase.from("gallery_photos").update(update).eq("id", p.id);
+      }),
     );
   };
 
