@@ -245,11 +245,13 @@ function AdminPage() {
     bucket.splice(toIdx, 0, moved);
 
     // Optimistic update of local state
-    const orderField = kind === "hero" ? "hero_order" : "featured_order";
     setPhotos((prev) =>
       prev.map((p) => {
         const idx = bucket.findIndex((x) => x.id === p.id);
-        return idx === -1 ? p : { ...p, [orderField]: idx };
+        if (idx === -1) return p;
+        return kind === "hero"
+          ? { ...p, hero_order: idx }
+          : { ...p, featured_order: idx };
       }),
     );
 
