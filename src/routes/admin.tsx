@@ -291,13 +291,25 @@ function AdminPage() {
           <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {photos.map((p) => (
               <div key={p.id} className="border border-border group">
-                <div className="relative overflow-hidden" style={{ aspectRatio: p.ratio }}>
+                <button
+                  type="button"
+                  onClick={() => setLightbox(p)}
+                  className="relative overflow-hidden w-full block cursor-zoom-in"
+                  style={{ aspectRatio: p.ratio }}
+                  aria-label={`Zvětšit ${p.title_cs}`}
+                >
                   <img
                     src={p.image_url}
                     alt={p.title_cs}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
+                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/40 transition-smooth flex items-center justify-center">
+                    <ZoomIn
+                      size={32}
+                      className="text-gold opacity-0 group-hover:opacity-100 transition-smooth"
+                    />
+                  </div>
                   {(p.is_hero || p.is_featured) && (
                     <div className="absolute top-2 left-2 flex gap-1">
                       {p.is_hero && (
@@ -312,7 +324,7 @@ function AdminPage() {
                       )}
                     </div>
                   )}
-                </div>
+                </button>
                 <div className="p-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-display text-lg truncate">{p.title_cs}</div>
