@@ -183,8 +183,8 @@ function HomePage() {
           </div>
 
           <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-            <GalleryImage photo={hero[0]} ratio="3/4" seed={11} className="translate-y-8" />
-            <GalleryImage photo={hero[1]} ratio="3/4" seed={12} />
+            {renderSlot(heroSlots[0], "3/4", 11, "translate-y-8")}
+            {renderSlot(heroSlots[1], "3/4", 12)}
           </div>
         </div>
 
