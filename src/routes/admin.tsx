@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Trash2, Upload, LogOut, Star, Sparkles } from "lucide-react";
+import { Trash2, Upload, LogOut, Star, Sparkles, X, ZoomIn } from "lucide-react";
 
 type Photo = {
   id: string;
