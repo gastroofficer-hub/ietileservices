@@ -369,6 +369,41 @@ function AdminPage() {
           </div>
         )}
       </div>
+
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            className="absolute top-6 right-6 text-foreground hover:text-gold transition-smooth"
+            aria-label="Zavřít"
+          >
+            <X size={32} />
+          </button>
+          <figure
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-7xl max-h-[90vh] flex flex-col items-center gap-4"
+          >
+            <img
+              src={lightbox.image_url}
+              alt={lightbox.title_cs}
+              className="max-w-full max-h-[80vh] object-contain border border-border"
+            />
+            <figcaption className="text-center">
+              <div className="font-display text-2xl">{lightbox.title_cs}</div>
+              {lightbox.tag && (
+                <div className="text-[10px] uppercase tracking-[0.25em] text-gold mt-1">
+                  {lightbox.tag}
+                </div>
+              )}
+            </figcaption>
+          </figure>
+        </div>
+      )}
     </section>
   );
 }
