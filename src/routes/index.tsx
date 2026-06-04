@@ -237,9 +237,9 @@ function HomePage() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <GalleryImage photo={featured[0]} ratio="4/5" seed={21} label="Marble Suite" />
-          <GalleryImage photo={featured[1]} ratio="4/5" seed={22} label="Atelier Praha" />
-          <GalleryImage photo={featured[2]} ratio="4/5" seed={23} label="Black Mineral" />
+          {renderSlot(featuredSlots[0], "4/5", 21)}
+          {renderSlot(featuredSlots[1], "4/5", 22)}
+          {renderSlot(featuredSlots[2], "4/5", 23)}
         </div>
       </section>
 
