@@ -18,6 +18,10 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          featured_order: number
+          featured_slot: number | null
+          hero_order: number
+          hero_slot: number | null
           id: string
           image_url: string
           is_featured: boolean
@@ -32,6 +36,10 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          featured_order?: number
+          featured_slot?: number | null
+          hero_order?: number
+          hero_slot?: number | null
           id?: string
           image_url: string
           is_featured?: boolean
@@ -46,6 +54,10 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          featured_order?: number
+          featured_slot?: number | null
+          hero_order?: number
+          hero_slot?: number | null
           id?: string
           image_url?: string
           is_featured?: boolean
@@ -56,6 +68,24 @@ export type Database = {
           tag?: string | null
           title_cs?: string
           title_en?: string | null
+        }
+        Relationships: []
+      }
+      gallery_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }

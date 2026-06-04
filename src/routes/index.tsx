@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
 import { LogoMark } from "@/components/Logo";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
@@ -13,6 +15,11 @@ type DbPhoto = {
   tag: string | null;
   ratio: string;
   image_url: string;
+  hero_slot: number | null;
+  featured_slot: number | null;
+  hero_order: number;
+  featured_order: number;
+  created_at: string;
 };
 
 export const Route = createFileRoute("/")({
@@ -36,92 +43,70 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function GalleryImage({
-  photo,
-  ratio,
-  label,
-  className,
-  seed,
-}: {
-  photo?: DbPhoto;
-  ratio: string;
-  label?: string;
-  className?: string;
-  seed: number;
-}) {
-  const { lang } = useLang();
-  if (!photo) {
-    return <PlaceholderImage ratio={ratio} seed={seed} label={label} className={className} />;
-  }
-  const title = lang === "en" ? photo.title_en ?? photo.title_cs : photo.title_cs;
-  return (
-    <figure className={`relative overflow-hidden group border border-border/40 ${className ?? ""}`}>
-      <div style={{ aspectRatio: ratio }} className="overflow-hidden">
-        <img
-          src={photo.image_url}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-      </div>
-      {label !== undefined && (
-        <figcaption className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background/90 to-transparent">
-          <div className="font-display text-xl text-foreground">{title}</div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-gold mt-1">
-            I&amp;E · {String(seed).padStart(2, "0")}
-          </div>
-        </figcaption>
-      )}
-    </figure>
-  );
-}
 
 function HomePage() {
-  const { t } = useLang();
-  const [hero, setHero] = useState<DbPhoto[]>([]);
-  const [featured, setFeatured] = useState<DbPhoto[]>([]);
+  const { t, lang } = useLang();
+  const [photos, setPhotos] = useState<DbPhoto[]>([]);
+  const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
 
   useEffect(() => {
-    const select = "id,title_cs,title_en,tag,ratio,image_url";
     (async () => {
-      const [{ data: heroData }, { data: featuredData }, { data: recent }] = await Promise.all([
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .eq("is_hero", true)
-          .order("sort_order", { ascending: true })
-          .limit(2),
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .eq("is_featured", true)
-          .order("sort_order", { ascending: true })
-          .limit(3),
-        supabase
-          .from("gallery_photos")
-          .select(select)
-          .order("created_at", { ascending: false })
-          .limit(6),
-      ]);
-
-      const recentList = (recent ?? []) as DbPhoto[];
-      const heroList = (heroData ?? []) as DbPhoto[];
-      const featuredList = (featuredData ?? []) as DbPhoto[];
-
-      // Fallback: fill missing slots with most recent photos not already used
-      const used = new Set<string>([
-        ...heroList.map((p) => p.id),
-        ...featuredList.map((p) => p.id),
-      ]);
-      const pool = recentList.filter((p) => !used.has(p.id));
-
-      while (heroList.length < 2 && pool.length) heroList.push(pool.shift()!);
-      while (featuredList.length < 3 && pool.length) featuredList.push(pool.shift()!);
-
-      setHero(heroList);
-      setFeatured(featuredList);
+      const { data } = await supabase
+        .from("gallery_photos")
+        .select(
+          "id,title_cs,title_en,tag,ratio,image_url,hero_slot,featured_slot,hero_order,featured_order,created_at",
+        )
+        .order("created_at", { ascending: false });
+      if (data) setPhotos(data as DbPhoto[]);
     })();
   }, []);
+
+  // Group photos into slot buckets and build fallback pool from recent photos
+  const { heroSlots, featuredSlots } = useMemo(() => {
+    const heroSlots: DbPhoto[][] = [[], []];
+    const featuredSlots: DbPhoto[][] = [[], [], []];
+    const used = new Set<string>();
+
+    photos.forEach((p) => {
+      if (p.hero_slot === 1 || p.hero_slot === 2) {
+        heroSlots[p.hero_slot - 1].push(p);
+        used.add(p.id);
+      }
+      if (p.featured_slot === 1 || p.featured_slot === 2 || p.featured_slot === 3) {
+        featuredSlots[p.featured_slot - 1].push(p);
+        used.add(p.id);
+      }
+    });
+
+    heroSlots.forEach((arr) => arr.sort((a, b) => a.hero_order - b.hero_order));
+    featuredSlots.forEach((arr) =>
+      arr.sort((a, b) => a.featured_order - b.featured_order),
+    );
+
+    // Fallback: fill empty slots with most recent unused photos
+    const pool = photos.filter((p) => !used.has(p.id));
+    heroSlots.forEach((arr) => {
+      if (arr.length === 0 && pool.length) arr.push(pool.shift()!);
+    });
+    featuredSlots.forEach((arr) => {
+      if (arr.length === 0 && pool.length) arr.push(pool.shift()!);
+    });
+
+    return { heroSlots, featuredSlots };
+  }, [photos]);
+
+  const renderSlot = (slot: DbPhoto[], ratio: string, seed: number, extra = "") =>
+    slot.length > 0 ? (
+      <PhotoCarousel
+        photos={slot}
+        ratio={ratio}
+        lang={lang}
+        className={extra}
+        onPhotoClick={(p) => setLightbox(p as DbPhoto)}
+      />
+    ) : (
+      <PlaceholderImage ratio={ratio} seed={seed} className={extra} />
+    );
 
   return (
     <>
@@ -159,8 +144,8 @@ function HomePage() {
           </div>
 
           <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-            <GalleryImage photo={hero[0]} ratio="3/4" seed={11} className="translate-y-8" />
-            <GalleryImage photo={hero[1]} ratio="3/4" seed={12} />
+            {renderSlot(heroSlots[0], "3/4", 11, "translate-y-8")}
+            {renderSlot(heroSlots[1], "3/4", 12)}
           </div>
         </div>
 
@@ -213,9 +198,9 @@ function HomePage() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <GalleryImage photo={featured[0]} ratio="4/5" seed={21} label="Marble Suite" />
-          <GalleryImage photo={featured[1]} ratio="4/5" seed={22} label="Atelier Praha" />
-          <GalleryImage photo={featured[2]} ratio="4/5" seed={23} label="Black Mineral" />
+          {renderSlot(featuredSlots[0], "4/5", 21)}
+          {renderSlot(featuredSlots[1], "4/5", 22)}
+          {renderSlot(featuredSlots[2], "4/5", 23)}
         </div>
       </section>
 
@@ -238,6 +223,16 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      {lightbox && (
+        <Lightbox
+          src={lightbox.image_url}
+          alt={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          caption={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          tag={lightbox.tag}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </>
   );
 }

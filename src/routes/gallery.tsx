@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { Eyebrow } from "./index";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
+import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
@@ -37,6 +38,7 @@ function GalleryPage() {
   const [tag, setTag] = useState(0);
   const [photos, setPhotos] = useState<DbPhoto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
 
   useEffect(() => {
     supabase
@@ -102,15 +104,21 @@ function GalleryPage() {
                 key={p.id}
                 className="relative overflow-hidden group border border-border/40"
               >
-                <div style={{ aspectRatio: p.ratio }} className="overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setLightbox(p)}
+                  className="block w-full text-left cursor-zoom-in"
+                  style={{ aspectRatio: p.ratio }}
+                  aria-label={title}
+                >
                   <img
                     src={p.image_url}
                     alt={title}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                </div>
-                <figcaption className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background/90 to-transparent">
+                </button>
+                <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background/90 to-transparent">
                   <div className="font-display text-xl text-foreground">{title}</div>
                   {p.tag && (
                     <div className="text-[10px] uppercase tracking-[0.3em] text-gold mt-1">
@@ -122,6 +130,16 @@ function GalleryPage() {
             );
           })}
         </div>
+      )}
+
+      {lightbox && (
+        <Lightbox
+          src={lightbox.image_url}
+          alt={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          caption={lang === "en" ? lightbox.title_en ?? lightbox.title_cs : lightbox.title_cs}
+          tag={lightbox.tag}
+          onClose={() => setLightbox(null)}
+        />
       )}
     </section>
   );
