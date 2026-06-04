@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { Eyebrow } from "./index";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
+import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
 
 type DbPhoto = {
