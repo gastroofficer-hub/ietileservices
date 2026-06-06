@@ -5,6 +5,7 @@ import { Eyebrow } from "./index";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
 import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 
 type DbPhoto = {
   id: string;
@@ -13,7 +14,11 @@ type DbPhoto = {
   tag: string | null;
   ratio: string;
   image_url: string;
+  created_at: string;
+  sort_order: number;
 };
+
+type SortOption = "newest" | "oldest" | "nameAsc" | "nameDesc";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -35,30 +40,69 @@ export const Route = createFileRoute("/gallery")({
 
 function GalleryPage() {
   const { t, lang } = useLang();
-  const [tag, setTag] = useState(0);
   const [photos, setPhotos] = useState<DbPhoto[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [activeTag, setActiveTag] = useState<string>("Vše");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
+  const [sortOpen, setSortOpen] = useState(false);
 
   useEffect(() => {
     supabase
       .from("gallery_photos")
-      .select("id,title_cs,title_en,tag,ratio,image_url")
+      .select("id,title_cs,title_en,tag,ratio,image_url,created_at,sort_order")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         if (data) setPhotos(data as DbPhoto[]);
         setLoading(false);
       });
+
+    supabase
+      .from("gallery_tags")
+      .select("name")
+      .order("name", { ascending: true })
+      .then(({ data }) => {
+        if (data) {
+          const allTags = data.map((d) => d.name).filter(Boolean) as string[];
+          setTags(allTags);
+        }
+      });
   }, []);
 
-  const activeTag = t.gallery.tags[tag];
+  const allTags = useMemo(() => {
+    const label = lang === "en" ? "All" : "Vše";
+    return [label, ...tags];
+  }, [tags, lang]);
+
   const filtered = useMemo(() => {
-    if (tag === 0) return photos;
-    return photos.filter(
-      (p) => (p.tag ?? "").toLowerCase() === activeTag.toLowerCase(),
-    );
-  }, [photos, tag, activeTag]);
+    const labelAll = lang === "en" ? "All" : "Vše";
+    let result = activeTag === labelAll ? photos : photos.filter((p) => p.tag === activeTag);
+
+    switch (sortBy) {
+      case "newest":
+        result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case "oldest":
+        result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case "nameAsc":
+        result = [...result].sort((a, b) => a.title_cs.localeCompare(b.title_cs));
+        break;
+      case "nameDesc":
+        result = [...result].sort((a, b) => b.title_cs.localeCompare(a.title_cs));
+        break;
+    }
+    return result;
+  }, [photos, activeTag, sortBy, lang]);
+
+  const sortLabelMap: Record<SortOption, string> = {
+    newest: t.gallery.sortNewest,
+    oldest: t.gallery.sortOldest,
+    nameAsc: t.gallery.sortNameAsc,
+    nameDesc: t.gallery.sortNameDesc,
+  };
 
   return (
     <section className="container-luxe py-24 lg:py-32">
@@ -66,20 +110,66 @@ function GalleryPage() {
       <h1 className="font-display text-5xl sm:text-6xl mt-4">{t.gallery.title}</h1>
       <p className="mt-6 text-lg text-muted-foreground max-w-xl">{t.gallery.lead}</p>
 
-      <div className="mt-12 flex flex-wrap gap-2 border-y border-border py-5">
-        {t.gallery.tags.map((g, i) => (
+      <div className="mt-12 border-y border-border py-5 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+        {/* Tag filters */}
+        <div className="flex flex-wrap gap-2">
+          {allTags.map((tagName) => (
+            <button
+              key={tagName}
+              onClick={() => setActiveTag(tagName)}
+              className={`px-4 py-2 text-xs uppercase tracking-[0.2em] transition-smooth ${
+                activeTag === tagName
+                  ? "bg-gold text-primary-foreground"
+                  : "text-muted-foreground hover:text-gold"
+              }`}
+            >
+              {tagName}
+            </button>
+          ))}
+        </div>
+
+        {/* Sort dropdown */}
+        <div className="relative lg:ml-auto">
           <button
-            key={i}
-            onClick={() => setTag(i)}
-            className={`px-4 py-2 text-xs uppercase tracking-[0.2em] transition-smooth ${
-              tag === i
-                ? "bg-gold text-primary-foreground"
-                : "text-muted-foreground hover:text-gold"
-            }`}
+            onClick={() => setSortOpen((o) => !o)}
+            className="flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-gold transition-smooth border border-border/40"
+            aria-haspopup="listbox"
+            aria-expanded={sortOpen}
           >
-            {g}
+            <SlidersHorizontal size={14} />
+            {t.gallery.sortLabel}: {sortLabelMap[sortBy]}
+            <ChevronDown size={14} className={`transition-transform ${sortOpen ? "rotate-180" : ""}`} />
           </button>
-        ))}
+          {sortOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
+              <ul
+                role="listbox"
+                className="absolute right-0 top-full mt-2 z-50 min-w-[200px] border border-border bg-card shadow-elegant"
+              >
+                {(["newest", "oldest", "nameAsc", "nameDesc"] as SortOption[]).map((opt) => (
+                  <li key={opt}>
+                    <button
+                      role="option"
+                      aria-selected={sortBy === opt}
+                      onClick={() => {
+                        setSortBy(opt);
+                        setSortOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-xs uppercase tracking-[0.15em] transition-smooth ${
+                        sortBy === opt
+                          ? "text-gold bg-gold/10"
+                          : "text-muted-foreground hover:text-gold hover:bg-gold/5"
+                      }`}
+                    >
+                      {sortLabelMap[opt]}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
 
       {loading ? (
