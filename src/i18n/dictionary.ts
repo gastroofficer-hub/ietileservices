@@ -54,6 +54,11 @@ const _dict = {
       title: "Galerie realizací",
       lead: "Výběr z dokončených projektů. Každá koupelna je originál.",
       tags: ["Vše", "Minimalistické", "Mramorové", "Industriální", "Malé prostory"],
+      sortLabel: "Seřadit",
+      sortNewest: "Nejnovější",
+      sortOldest: "Nejstarší",
+      sortNameAsc: "Název A–Z",
+      sortNameDesc: "Název Z–A",
     },
     pricing: {
       title: "Orientační ceník",
@@ -194,6 +199,11 @@ const _dict = {
       title: "Project gallery",
       lead: "A selection of completed projects. Every bathroom is one of a kind.",
       tags: ["All", "Minimal", "Marble", "Industrial", "Small spaces"],
+      sortLabel: "Sort",
+      sortNewest: "Newest first",
+      sortOldest: "Oldest first",
+      sortNameAsc: "Name A–Z",
+      sortNameDesc: "Name Z–A",
     },
     pricing: {
       title: "Indicative pricing",
