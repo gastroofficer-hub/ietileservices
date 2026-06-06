@@ -5,7 +5,7 @@ import { Eyebrow } from "./index";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
 import { Lightbox } from "@/components/Lightbox";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 
 type DbPhoto = {
   id: string;
@@ -42,7 +42,7 @@ function GalleryPage() {
   const { t, lang } = useLang();
   const [photos, setPhotos] = useState<DbPhoto[]>([]);
   const [tags, setTags] = useState<string[]>([]);
-  const [activeTag, setActiveTag] = useState<string>("Vše");
+  const [activeTags, setActiveTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<DbPhoto | null>(null);
@@ -72,13 +72,30 @@ function GalleryPage() {
   }, []);
 
   const allTags = useMemo(() => {
-    const label = lang === "en" ? "All" : "Vše";
-    return [label, ...tags];
-  }, [tags, lang]);
+    return [...tags];
+  }, [tags]);
+
+  const labelAll = lang === "en" ? "All" : "Vše";
+
+  const toggleTag = (tagName: string) => {
+    if (tagName === labelAll) {
+      setActiveTags([]);
+      return;
+    }
+    setActiveTags((prev) => {
+      if (prev.includes(tagName)) {
+        const next = prev.filter((t) => t !== tagName);
+        return next;
+      }
+      return [...prev, tagName];
+    });
+  };
 
   const filtered = useMemo(() => {
-    const labelAll = lang === "en" ? "All" : "Vše";
-    let result = activeTag === labelAll ? photos : photos.filter((p) => p.tag === activeTag);
+    let result =
+      activeTags.length === 0
+        ? photos
+        : photos.filter((p) => p.tag && activeTags.includes(p.tag));
 
     switch (sortBy) {
       case "newest":
@@ -95,7 +112,7 @@ function GalleryPage() {
         break;
     }
     return result;
-  }, [photos, activeTag, sortBy, lang]);
+  }, [photos, activeTags, sortBy]);
 
   const sortLabelMap: Record<SortOption, string> = {
     newest: t.gallery.sortNewest,
@@ -104,28 +121,44 @@ function GalleryPage() {
     nameDesc: t.gallery.sortNameDesc,
   };
 
+  const isAllActive = activeTags.length === 0;
+
   return (
     <section className="container-luxe py-24 lg:py-32">
       <Eyebrow>02 — {t.nav.gallery}</Eyebrow>
       <h1 className="font-display text-5xl sm:text-6xl mt-4">{t.gallery.title}</h1>
       <p className="mt-6 text-lg text-muted-foreground max-w-xl">{t.gallery.lead}</p>
 
-      <div className="mt-12 border-y border-border py-5 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+      <div className="mt-12 border-y border-border py-5 flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-8">
         {/* Tag filters */}
-        <div className="flex flex-wrap gap-2">
-          {allTags.map((tagName) => (
-            <button
-              key={tagName}
-              onClick={() => setActiveTag(tagName)}
-              className={`px-4 py-2 text-xs uppercase tracking-[0.2em] transition-smooth ${
-                activeTag === tagName
-                  ? "bg-gold text-primary-foreground"
-                  : "text-muted-foreground hover:text-gold"
-              }`}
-            >
-              {tagName}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 items-center">
+          <button
+            onClick={() => setActiveTags([])}
+            className={`px-4 py-2 text-xs uppercase tracking-[0.2em] transition-smooth ${
+              isAllActive
+                ? "bg-gold text-primary-foreground"
+                : "text-muted-foreground hover:text-gold"
+            }`}
+          >
+            {labelAll}
+          </button>
+          {allTags.map((tagName) => {
+            const selected = activeTags.includes(tagName);
+            return (
+              <button
+                key={tagName}
+                onClick={() => toggleTag(tagName)}
+                className={`px-4 py-2 text-xs uppercase tracking-[0.2em] transition-smooth inline-flex items-center gap-2 ${
+                  selected
+                    ? "bg-gold text-primary-foreground"
+                    : "text-muted-foreground hover:text-gold"
+                }`}
+              >
+                {tagName}
+                {selected && <X size={12} strokeWidth={3} />}
+              </button>
+            );
+          })}
         </div>
 
         {/* Sort dropdown */}
@@ -170,6 +203,11 @@ function GalleryPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Result count */}
+      <div className="mt-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+        {filtered.length} {lang === "en" ? (filtered.length === 1 ? "project" : "projects") : (filtered.length === 1 ? "projekt" : filtered.length < 5 ? "projekty" : "projektů")}
       </div>
 
       {loading ? (
