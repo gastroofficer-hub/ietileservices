@@ -95,7 +95,7 @@ export function AdminBilingualList({
       payload[`${c.key}_cs`] = adding[`${c.key}_cs`] ?? "";
       payload[`${c.key}_en`] = adding[`${c.key}_en`] ?? null;
     });
-    const { error } = await supabase.from(table).insert(payload);
+    const { error } = await supabase.from(table).insert(payload as any);
     if (error) alert(error.message);
     else {
       setAdding({});
