@@ -3,6 +3,10 @@ import { useEffect, useState, useCallback, useMemo, type FormEvent } from "react
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Lightbox } from "@/components/Lightbox";
+import { AdminTeam } from "@/components/admin/AdminTeam";
+import { AdminBilingualList } from "@/components/admin/AdminBilingualList";
+import { AdminPageTexts } from "@/components/admin/AdminPageTexts";
+import { AdminPricingPackages } from "@/components/admin/AdminPricingPackages";
 import {
   Trash2,
   Upload,
@@ -14,6 +18,8 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
+
+type AdminTab = "gallery" | "about" | "services" | "pricing";
 
 type Photo = {
   id: string;
