@@ -31,15 +31,12 @@ function AboutPage() {
       <p className="mt-6 text-lg text-muted-foreground max-w-2xl">{t.about.lead}</p>
 
       <div className="mt-20 grid lg:grid-cols-12 gap-12 items-start">
-        <div className="lg:col-span-5">
-          <div className="relative overflow-hidden bg-card border border-border" style={{ aspectRatio: "4/5" }}>
-            <img
-              src={teamAsset.url}
-              alt="Tým I&E Tile Services"
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
+        <div className="lg:col-span-5 animate-fade-up">
+          <TeamGallery
+            photos={[
+              { src: teamAsset.url, alt: "Tým I&E Tile Services", caption: "Tým I&E Tile Services" },
+            ]}
+          />
         </div>
         <div className="lg:col-span-7 space-y-6">
           {t.about.body.map((p, i) => (
