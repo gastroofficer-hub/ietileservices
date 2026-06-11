@@ -57,7 +57,7 @@ export function AdminBilingualList({
       patch[`${c.key}_cs`] = r[`${c.key}_cs`] ?? "";
       patch[`${c.key}_en`] = r[`${c.key}_en`] ?? null;
     });
-    const { error } = await supabase.from(table).update(patch).eq("id", id);
+    const { error } = await supabase.from(table).update(patch as any).eq("id", id);
     setSavingId(null);
     if (error) alert(error.message);
   };
