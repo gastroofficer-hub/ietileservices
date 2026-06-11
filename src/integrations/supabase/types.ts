@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_paragraphs: {
+        Row: {
+          body_cs: string
+          body_en: string | null
+          created_at: string
+          id: string
+          sort_order: number
+        }
+        Insert: {
+          body_cs: string
+          body_en?: string | null
+          created_at?: string
+          id?: string
+          sort_order?: number
+        }
+        Update: {
+          body_cs?: string
+          body_en?: string | null
+          created_at?: string
+          id?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      about_values: {
+        Row: {
+          created_at: string
+          desc_cs: string | null
+          desc_en: string | null
+          id: string
+          sort_order: number
+          title_cs: string
+          title_en: string | null
+        }
+        Insert: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          id?: string
+          sort_order?: number
+          title_cs: string
+          title_en?: string | null
+        }
+        Update: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          id?: string
+          sort_order?: number
+          title_cs?: string
+          title_en?: string | null
+        }
+        Relationships: []
+      }
       gallery_photos: {
         Row: {
           created_at: string
@@ -86,6 +140,168 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      page_texts: {
+        Row: {
+          key: string
+          updated_at: string
+          value_cs: string | null
+          value_en: string | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value_cs?: string | null
+          value_en?: string | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value_cs?: string | null
+          value_en?: string | null
+        }
+        Relationships: []
+      }
+      pricing_items: {
+        Row: {
+          created_at: string
+          id: string
+          price_cs: string | null
+          price_en: string | null
+          sort_order: number
+          title_cs: string
+          title_en: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price_cs?: string | null
+          price_en?: string | null
+          sort_order?: number
+          title_cs: string
+          title_en?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price_cs?: string | null
+          price_en?: string | null
+          sort_order?: number
+          title_cs?: string
+          title_en?: string | null
+        }
+        Relationships: []
+      }
+      pricing_packages: {
+        Row: {
+          created_at: string
+          desc_cs: string | null
+          desc_en: string | null
+          featured: boolean
+          features_cs: string[]
+          features_en: string[]
+          id: string
+          name_cs: string
+          name_en: string | null
+          price_cs: string | null
+          price_en: string | null
+          sort_order: number
+          unit_cs: string | null
+          unit_en: string | null
+        }
+        Insert: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          featured?: boolean
+          features_cs?: string[]
+          features_en?: string[]
+          id?: string
+          name_cs: string
+          name_en?: string | null
+          price_cs?: string | null
+          price_en?: string | null
+          sort_order?: number
+          unit_cs?: string | null
+          unit_en?: string | null
+        }
+        Update: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          featured?: boolean
+          features_cs?: string[]
+          features_en?: string[]
+          id?: string
+          name_cs?: string
+          name_en?: string | null
+          price_cs?: string | null
+          price_en?: string | null
+          sort_order?: number
+          unit_cs?: string | null
+          unit_en?: string | null
+        }
+        Relationships: []
+      }
+      service_items: {
+        Row: {
+          created_at: string
+          desc_cs: string | null
+          desc_en: string | null
+          id: string
+          sort_order: number
+          title_cs: string
+          title_en: string | null
+        }
+        Insert: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          id?: string
+          sort_order?: number
+          title_cs: string
+          title_en?: string | null
+        }
+        Update: {
+          created_at?: string
+          desc_cs?: string | null
+          desc_en?: string | null
+          id?: string
+          sort_order?: number
+          title_cs?: string
+          title_en?: string | null
+        }
+        Relationships: []
+      }
+      team_photos: {
+        Row: {
+          caption_cs: string | null
+          caption_en: string | null
+          created_at: string
+          id: string
+          image_url: string
+          sort_order: number
+          storage_path: string
+        }
+        Insert: {
+          caption_cs?: string | null
+          caption_en?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          sort_order?: number
+          storage_path: string
+        }
+        Update: {
+          caption_cs?: string | null
+          caption_en?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          sort_order?: number
+          storage_path?: string
         }
         Relationships: []
       }
