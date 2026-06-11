@@ -105,7 +105,7 @@ export function AdminTeam() {
   return (
     <AdminSection
       title="Týmové fotky (sekce O nás)"
-      description="Mini-galerie fotek zobrazená v sekci „O nás". Pořadí lze měnit šipkami."
+      description={'Mini-galerie fotek zobrazená v sekci „O nás". Pořadí lze měnit šipkami.'}
     >
       <form onSubmit={onUpload} className="border border-dashed border-border p-4 grid gap-3 mb-8">
         <div className="text-xs uppercase tracking-[0.25em] text-gold">Nahrát novou fotku</div>
