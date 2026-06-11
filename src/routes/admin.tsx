@@ -301,7 +301,7 @@ function AdminPage() {
       <div className="flex items-start justify-between flex-wrap gap-6">
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-gold">Admin</div>
-          <h1 className="mt-3 font-display text-5xl">Správa galerie</h1>
+          <h1 className="mt-3 font-display text-5xl">Admin</h1>
           <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
         </div>
         <div className="flex gap-3">
