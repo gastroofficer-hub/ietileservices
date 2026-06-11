@@ -320,6 +320,31 @@ function AdminPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="mt-10 flex flex-wrap gap-2 border-b border-border">
+        {([
+          ["gallery", "Galerie"],
+          ["about", "O nás"],
+          ["services", "Služby"],
+          ["pricing", "Ceník"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={`px-5 py-3 text-[11px] uppercase tracking-[0.25em] transition-smooth border-b-2 -mb-px ${
+              tab === key
+                ? "text-gold border-gold"
+                : "text-muted-foreground border-transparent hover:text-foreground"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "gallery" && (
+      <>
       {/* HERO + FEATURED placement boards */}
       <div className="mt-12 grid gap-12">
         <PlacementBoard
