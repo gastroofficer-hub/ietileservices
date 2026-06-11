@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useLang } from "@/i18n/LanguageProvider";
 import { Eyebrow } from "./index";
 import { PlaceholderImage } from "@/components/PlaceholderImage";
+import teamAsset from "@/assets/team.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
