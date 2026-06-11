@@ -3,6 +3,10 @@ import { useEffect, useState, useCallback, useMemo, type FormEvent } from "react
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Lightbox } from "@/components/Lightbox";
+import { AdminTeam } from "@/components/admin/AdminTeam";
+import { AdminBilingualList } from "@/components/admin/AdminBilingualList";
+import { AdminPageTexts } from "@/components/admin/AdminPageTexts";
+import { AdminPricingPackages } from "@/components/admin/AdminPricingPackages";
 import {
   Trash2,
   Upload,
@@ -14,6 +18,8 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
+
+type AdminTab = "gallery" | "about" | "services" | "pricing";
 
 type Photo = {
   id: string;
@@ -49,6 +55,7 @@ const FEATURED_SLOTS = [1, 2, 3] as const;
 function AdminPage() {
   const navigate = useNavigate();
   const { session, loading, isAdmin, user } = useAuth();
+  const [tab, setTab] = useState<AdminTab>("gallery");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
@@ -294,7 +301,7 @@ function AdminPage() {
       <div className="flex items-start justify-between flex-wrap gap-6">
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-gold">Admin</div>
-          <h1 className="mt-3 font-display text-5xl">Správa galerie</h1>
+          <h1 className="mt-3 font-display text-5xl">Admin</h1>
           <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
         </div>
         <div className="flex gap-3">
@@ -313,6 +320,31 @@ function AdminPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="mt-10 flex flex-wrap gap-2 border-b border-border">
+        {([
+          ["gallery", "Galerie"],
+          ["about", "O nás"],
+          ["services", "Služby"],
+          ["pricing", "Ceník"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={`px-5 py-3 text-[11px] uppercase tracking-[0.25em] transition-smooth border-b-2 -mb-px ${
+              tab === key
+                ? "text-gold border-gold"
+                : "text-muted-foreground border-transparent hover:text-foreground"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "gallery" && (
+      <>
       {/* HERO + FEATURED placement boards */}
       <div className="mt-12 grid gap-12">
         <PlacementBoard
@@ -587,6 +619,82 @@ function AdminPage() {
           </div>
         )}
       </div>
+      </>
+      )}
+
+      {tab === "about" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky O nás"
+            description="Nadpis a úvodní text."
+            fields={[
+              { key: "about.title", label: "Nadpis stránky" },
+              { key: "about.lead", label: "Úvodní text", multiline: true },
+            ]}
+          />
+          <AdminTeam />
+          <AdminBilingualList
+            title="Odstavce textu (O nás)"
+            description="Hlavní textové odstavce zobrazené vedle týmové fotky."
+            table="about_paragraphs"
+            cols={[{ key: "body", label: "Text odstavce", multiline: true }]}
+          />
+          <AdminBilingualList
+            title="Hodnoty firmy"
+            description="Tři karty pod hlavním textem."
+            table="about_values"
+            cols={[
+              { key: "title", label: "Název" },
+              { key: "desc", label: "Popis", multiline: true },
+            ]}
+          />
+        </div>
+      )}
+
+      {tab === "services" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky Služby"
+            fields={[
+              { key: "services.title", label: "Nadpis stránky" },
+              { key: "services.lead", label: "Úvodní text", multiline: true },
+            ]}
+          />
+          <AdminBilingualList
+            title="Položky služeb"
+            description="Karty zobrazené na stránce Služby."
+            table="service_items"
+            cols={[
+              { key: "title", label: "Název služby" },
+              { key: "desc", label: "Popis", multiline: true },
+            ]}
+          />
+        </div>
+      )}
+
+      {tab === "pricing" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky Ceník"
+            fields={[
+              { key: "pricing.title", label: "Nadpis stránky" },
+              { key: "pricing.lead", label: "Úvodní text", multiline: true },
+              { key: "pricing.itemizedTitle", label: "Nadpis položkového ceníku" },
+            ]}
+          />
+          <AdminPricingPackages />
+          <AdminBilingualList
+            title="Položkový ceník"
+            description="Seznam položek s cenami pod balíčky."
+            table="pricing_items"
+            cols={[
+              { key: "title", label: "Položka" },
+              { key: "price", label: "Cena" },
+            ]}
+          />
+        </div>
+      )}
+
 
       {lightbox && (
         <Lightbox
