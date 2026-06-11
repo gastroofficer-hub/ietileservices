@@ -55,6 +55,7 @@ const FEATURED_SLOTS = [1, 2, 3] as const;
 function AdminPage() {
   const navigate = useNavigate();
   const { session, loading, isAdmin, user } = useAuth();
+  const [tab, setTab] = useState<AdminTab>("gallery");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
