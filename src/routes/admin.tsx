@@ -619,6 +619,82 @@ function AdminPage() {
           </div>
         )}
       </div>
+      </>
+      )}
+
+      {tab === "about" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky O nás"
+            description="Nadpis a úvodní text."
+            fields={[
+              { key: "about.title", label: "Nadpis stránky" },
+              { key: "about.lead", label: "Úvodní text", multiline: true },
+            ]}
+          />
+          <AdminTeam />
+          <AdminBilingualList
+            title="Odstavce textu (O nás)"
+            description="Hlavní textové odstavce zobrazené vedle týmové fotky."
+            table="about_paragraphs"
+            cols={[{ key: "body", label: "Text odstavce", multiline: true }]}
+          />
+          <AdminBilingualList
+            title="Hodnoty firmy"
+            description="Tři karty pod hlavním textem."
+            table="about_values"
+            cols={[
+              { key: "title", label: "Název" },
+              { key: "desc", label: "Popis", multiline: true },
+            ]}
+          />
+        </div>
+      )}
+
+      {tab === "services" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky Služby"
+            fields={[
+              { key: "services.title", label: "Nadpis stránky" },
+              { key: "services.lead", label: "Úvodní text", multiline: true },
+            ]}
+          />
+          <AdminBilingualList
+            title="Položky služeb"
+            description="Karty zobrazené na stránce Služby."
+            table="service_items"
+            cols={[
+              { key: "title", label: "Název služby" },
+              { key: "desc", label: "Popis", multiline: true },
+            ]}
+          />
+        </div>
+      )}
+
+      {tab === "pricing" && (
+        <div className="mt-12 grid gap-8">
+          <AdminPageTexts
+            title="Texty stránky Ceník"
+            fields={[
+              { key: "pricing.title", label: "Nadpis stránky" },
+              { key: "pricing.lead", label: "Úvodní text", multiline: true },
+              { key: "pricing.itemizedTitle", label: "Nadpis položkového ceníku" },
+            ]}
+          />
+          <AdminPricingPackages />
+          <AdminBilingualList
+            title="Položkový ceník"
+            description="Seznam položek s cenami pod balíčky."
+            table="pricing_items"
+            cols={[
+              { key: "title", label: "Položka" },
+              { key: "price", label: "Cena" },
+            ]}
+          />
+        </div>
+      )}
+
 
       {lightbox && (
         <Lightbox
